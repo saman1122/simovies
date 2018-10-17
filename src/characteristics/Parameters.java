@@ -23,7 +23,7 @@ public class Parameters {
   //-----------------------//
   public static final String teamAName = "Cartel Sinaloa";
   public static final String teamAMainBotBrainClassName = "algorithms.BrainCanevas"; //class given by name; is supposed to extends robotsimulator.Brain
-  public static final String teamAMainBotAvatar = "avatars/cyclope.png"; //path relative to location of ant build.xml file
+  public static final String teamAMainBotAvatar = "avatars/GangsterBoss.png"; //path relative to location of ant build.xml file
   public static final double teamAMainBotRadius = 50, //1 unit = 1mm, body radius
                              teamAMainBotFrontalDetectionRange = 300, //1 unit = 1mm, range of frontal sensor
                              teamAMainBotFrontalDetectionAngle = 0, //UNUSED AT THE MOMENT, frontal sensor detection angle is suppoed to be absolute
@@ -41,7 +41,7 @@ public class Parameters {
                              teamAMainBot3InitHeading = EAST; //clockwise trigonometric unit, according to screen pixel coordinate reference
 
   public static final String teamASecondaryBotBrainClassName = "algorithms.BrainCanevas"; //class given by name; is supposed to extends robotsimulator.Brain
-  public static final String teamASecondaryBotAvatar = "avatars/clumpsy.png"; //path relative to location of ant build.xml file
+  public static final String teamASecondaryBotAvatar = "avatars/GangsterSecondary.png"; //path relative to location of ant build.xml file
   public static final double teamASecondaryBotRadius = 50, //1 unit = 1mm, body radius
                              teamASecondaryBotFrontalDetectionRange = 500, //1 unit = 1mm, range of frontal sensor
                              teamASecondaryBotFrontalDetectionAngle = 0, //UNUSED AT THE MOMENT, frontal sensor detection angle is suppoed to be absolute
@@ -58,7 +58,7 @@ public class Parameters {
   //-----------------------//
   //---TEAM-B-PARAMETERS---//
   //-----------------------//
-  public static final String teamBName = "Handec";
+  public static final String teamBName = "Fantom Danger";
   public static final String teamBMainBotBrainClassName = "algorithms.CampFire"; //class given by name; is supposed to extends robotsimulator.Brain
   public static final String teamBMainBotAvatar = "avatars/hollowee.png"; //path relative to location of ant build.xml file
   public static final double teamBMainBotRadius = 50, //1 unit = 1mm, body radius
