@@ -28,7 +28,7 @@ public class CampFire extends Brain {
     turnTask=true;
     endMove=false;
     taskOne=true;
-    endTaskDirection=getHeading()+0.5*Math.PI;
+    endTaskDirection=getHeading()+0.2*Math.PI;
     stepTurn(Parameters.Direction.RIGHT);
     sendLogMessage("Rocking and rolling.");
   }
@@ -38,7 +38,7 @@ public class CampFire extends Brain {
     if (turnTask) {
       if (isHeading(endTaskDirection)) {
 	turnTask=false;
-        if (taskOne) endTaskCounter=700; else if (id==1) endTaskCounter=400; else endTaskCounter=250;
+        if (taskOne) endTaskCounter=10000; else if (id==1) endTaskCounter=400; else endTaskCounter=250;
 	move();
       } else {
         if (taskOne) stepTurn(Parameters.Direction.RIGHT);

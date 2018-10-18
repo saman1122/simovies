@@ -33,7 +33,7 @@ public class CampBot extends Brain {
     if (turnTask) {
       if (isHeading(endTaskDirection)) {
 	turnTask=false;
-        if (taskOne) endTaskCounter=200; else endTaskCounter=100;
+        if (taskOne) endTaskCounter=100000; else endTaskCounter=100;
 	move();
       } else {
         stepTurn(Parameters.Direction.RIGHT);
