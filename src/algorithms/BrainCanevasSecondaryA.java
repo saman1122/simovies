@@ -12,20 +12,27 @@ import characteristics.Parameters;
 import robotsimulator.Brain;
 
 public class BrainCanevasSecondaryA extends Brain {
+    //--CONSTANTS--//
+    private static final double FIRST_POSITION_X = 200;
+    private static final double FINAL_POSITION_X = 2800;
+    private static final double POSITION_Y_ECLAIREUR = 300;
+    private static final double POSITION_Y_ECLAIREUR2 = 1700;
     //---PARAMETERS---//
     private static final double HEADINGPRECISION = 0.001;
-    private static final double ANGLEPRECISION = 0.1;
+    private static final double ANGLEPRECISION = 0.15;
     private static final int ECLAIREUR = 0x1EADDA;
     private static final int ECLAIREUR_AUSSI = 0x5EC0;
 
     //---VARIABLES---//
-    private boolean turnNorthTask, turnLeftTask;
     private double endTaskDirection;
     private double myX, myY;
-    private double xMax, yMax;
-    private double speed, detectionRange;
+    private double speed;
     private boolean isMoving;
     private int whoAmI;
+    private boolean turnTask, turnRight, moveTask;
+    private int endTaskCounter;
+    private boolean firstMove;
+    private double positionX, positionY;
 
     //---CONSTRUCTORS---//
     public BrainCanevasSecondaryA() {
@@ -41,19 +48,26 @@ public class BrainCanevasSecondaryA extends Brain {
         if (whoAmI == ECLAIREUR) {
             myX = Parameters.teamASecondaryBot1InitX;
             myY = Parameters.teamASecondaryBot1InitY;
+            positionY = POSITION_Y_ECLAIREUR;
         } else {
             myX = Parameters.teamASecondaryBot2InitX;
             myY = Parameters.teamASecondaryBot2InitY;
+            positionY = POSITION_Y_ECLAIREUR2;
         }
 
         //INIT
-        xMax = 0;
-        yMax = 0;
+        positionX = FIRST_POSITION_X;
         speed = Parameters.teamASecondaryBotSpeed;
-        detectionRange = Parameters.teamBSecondaryBotFrontalDetectionRange;
-        turnNorthTask = true;
-        turnLeftTask = false;
         isMoving = false;
+        turnTask = true;
+        moveTask = false;
+        firstMove = true;
+        endTaskDirection = (Math.random() - 0.5) * 0.5 * Math.PI;
+        turnRight = (endTaskDirection > 0);
+        endTaskDirection += getHeading();
+        if (turnRight) stepTurn(Parameters.Direction.RIGHT);
+        else stepTurn(Parameters.Direction.LEFT);
+        sendLogMessage("Turning point. Waza!");
     }
 
     public void step() {
@@ -61,69 +75,153 @@ public class BrainCanevasSecondaryA extends Brain {
         if (isMoving) {
             myX += speed * Math.cos(getHeading());
             myY += speed * Math.sin(getHeading());
-
-            if (myX + detectionRange > xMax) xMax = myX + detectionRange;
-            if (myY + detectionRange > yMax) yMax = myY + detectionRange;
-
             isMoving = false;
         }
-        //DEBUG MESSAGE
-        String message;
-        if (whoAmI == ECLAIREUR) {
-            message = "Eclaireur ";
+        sendLogMessage("My position: (" + myX + ";" + myY + ")");
+
+        boolean ennemieDetected = false;
+        double directionEnnemie = 0;
+        double distanceEnnemie = Double.MAX_VALUE;
+        for (IRadarResult o : detectRadar()) {
+            IRadarResult.Types type = o.getObjectType();
+            if (isEnemies(type)) {
+                ennemieDetected = true;
+                double distance = o.getObjectDistance();
+                if (distance < distanceEnnemie) {
+                    distanceEnnemie = distance;
+                    directionEnnemie = o.getObjectDirection();
+                }
+            }
+        }
+
+        if (ennemieDetected) {
+            broadcast("Enemies," + getXfromDirectionAndDistance(directionEnnemie, distanceEnnemie) + "," + getYfromDirectionAndDistance(directionEnnemie, distanceEnnemie));
+            return;
+        }
+
+        if (isInPosition(positionX, positionY)) {
+            if (positionX == FIRST_POSITION_X) {
+                positionX = FINAL_POSITION_X;
+            } else {
+                positionX = FIRST_POSITION_X;
+            }
+        }
+        moveTo(positionX, positionY);
+
+        /*
+
+        if (turnTask) {
+            if (isHeading(endTaskDirection)) {
+                if (firstMove) {
+                    firstMove = false;
+                    turnTask = false;
+                    moveTask = true;
+                    endTaskCounter = 400;
+                    myMove();
+                    sendLogMessage("Moving a head. Waza!");
+                    return;
+                }
+                turnTask = false;
+                moveTask = true;
+                endTaskCounter = 200;
+                myMove();
+                sendLogMessage("Moving a head. Waza!");
+            } else {
+                if (turnRight) stepTurn(Parameters.Direction.RIGHT);
+                else stepTurn(Parameters.Direction.LEFT);
+            }
+            return;
+        }
+        if (moveTask) {
+      /*if (detectFront()!=NOTHING) {
+        turnTask=true;
+        moveTask=false;
+        endTaskDirection=(Math.random()-0.5)*Math.PI;
+        turnRight=(endTaskDirection>0);
+        endTaskDirection+=getHeading();
+        if (turnRight) stepTurn(Parameters.Direction.RIGHT);
+        else stepTurn(Parameters.Direction.LEFT);
+        sendLogMessage("Turning point. Waza!");
+      }*/
+        /*
+            if (endTaskCounter < 0) {
+                turnTask = true;
+                moveTask = false;
+                endTaskDirection = (Math.random() - 0.5) * 2 * Math.PI;
+                turnRight = (endTaskDirection > 0);
+                endTaskDirection += getHeading();
+                if (turnRight) stepTurn(Parameters.Direction.RIGHT);
+                else stepTurn(Parameters.Direction.LEFT);
+                sendLogMessage("Turning point. Waza!");
+            } else {
+                endTaskCounter--;
+                myMove();
+            }
+            return;
+        }
+        return;
+    */
+    }
+
+    private void moveTo(double x, double y) {
+        double direction = getDirectionFromPoint(x, y);
+        if (isSameDirection(getHeading(), direction)) {
+            myMove();
         } else {
-            message = "Eclaireur_Aussi ";
+            if (getHeading() > direction) {
+                stepTurn(Parameters.Direction.LEFT);
+            } else {
+                stepTurn(Parameters.Direction.RIGHT);
+            }
         }
+    }
 
-        sendLogMessage(message + "position (" + (int) myX + ", " + (int) myY + "). xMax: " + xMax + " | yMax: " + yMax);
+    private double getDirectionFromPoint(double x, double y) {
+        double direction = myX - x < 0 ? Math.atan((myY - y) / (myX - x)) : Math.PI + Math.atan((myY - y) / (myX - x));
+        return direction;
+    }
 
-        //AUTOMATON
-        if (turnNorthTask && isHeading(Parameters.NORTH)) {
-            turnNorthTask = false;
-            myMove();
-            //sendLogMessage("Moving a head. Waza!");
-            return;
-        }
-        if (turnNorthTask && !isHeading(Parameters.NORTH)) {
-            stepTurn(Parameters.Direction.RIGHT);
-            //sendLogMessage("Initial TeamB position. Heading North!");
-            return;
-        }
-        if (turnLeftTask && isHeading(endTaskDirection)) {
-            turnLeftTask = false;
-            myMove();
-            //sendLogMessage("Moving a head. Waza!");
-            return;
-        }
-        if (turnLeftTask && !isHeading(endTaskDirection)) {
-            stepTurn(Parameters.Direction.LEFT);
-            //sendLogMessage("Iceberg at 12 o'clock. Heading 9!");
-            return;
-        }
-        if (!turnNorthTask && !turnLeftTask && detectFront().getObjectType() == IFrontSensorResult.Types.WALL) {
-            turnLeftTask = true;
-            endTaskDirection = getHeading() + Parameters.LEFTTURNFULLANGLE;
-            stepTurn(Parameters.Direction.LEFT);
-            //sendLogMessage("Iceberg at 12 o'clock. Heading 9!");
-            return;
-        }
-        if (!turnNorthTask && !turnLeftTask && detectFront().getObjectType() != IFrontSensorResult.Types.WALL) {
-            myMove(); //And what to do when blind blocked?
-            //sendLogMessage("Moving a head. Waza!");
-            return;
-        }
+    private double getXfromDirectionAndDistance(double dir, double distance) {
+        return myX + (distance * Math.cos(dir));
+    }
+
+    private double getYfromDirectionAndDistance(double dir, double distance) {
+        return myY + (distance * Math.sin(dir));
+    }
+
+    private boolean isEnemies(IRadarResult.Types type) {
+        return type == IRadarResult.Types.OpponentMainBot || type == IRadarResult.Types.OpponentSecondaryBot;
+    }
+
+    private boolean isInPosition(double x, double y) {
+        return Math.sqrt(sqr(x - myX) + sqr(y - myY)) < 10;
+    }
+
+    private double sqr(double value) {
+        return value * value;
     }
 
     private void myMove() {
-        isMoving = true;
-        move();
+        boolean somethingFront = false;
+        for (IRadarResult o : detectRadar()) {
+            if(isSameDirection(getHeading(), o.getObjectDirection())) somethingFront = true;
+        }
+
+        if (somethingFront) {
+            stepTurn(Parameters.Direction.LEFT);
+        }else {
+            isMoving = true;
+            move();
+        }
     }
 
     private boolean isHeading(double dir) {
-        return Math.abs(Math.sin(getHeading() - dir)) < HEADINGPRECISION;
+        return Math.abs(Math.sin(getHeading() - dir)) < Parameters.teamAMainBotStepTurnAngle;
     }
 
     private boolean isSameDirection(double dir1, double dir2) {
+        if (dir1 < 0) dir1 = dir1 + 2 * Math.PI;
+        if (dir2 < 0) dir2 = dir2 + 2 * Math.PI;
         return Math.abs(dir1 - dir2) < ANGLEPRECISION;
     }
 }
