@@ -124,8 +124,9 @@ public class BrainCanevasSecondary extends Brain {
     }
 
     private double getDirectionFromPoint(Position position) {
-        double direction = myPosition.x - position.x < 0 ? Math.atan((myPosition.y - position.y) / (myPosition.x - position.x)) : Math.PI + Math.atan((myPosition.y - position.y) / (myPosition.x - position.x));
-        return direction;
+        return myPosition.x - position.x < 0 ?
+                Math.atan((myPosition.y - position.y) / (myPosition.x - position.x)) :
+                Math.PI + Math.atan((myPosition.y - position.y) / (myPosition.x - position.x));
     }
 
     private Position getPostionfromDirectionAndDistance(double dir, double distance) {
@@ -165,8 +166,6 @@ public class BrainCanevasSecondary extends Brain {
     }
 
     private boolean isSameDirection(double dir1, double dir2) {
-        if (dir1 < 0) dir1 = dir1 + 2 * Math.PI;
-        if (dir2 < 0) dir2 = dir2 + 2 * Math.PI;
         return Math.abs(dir1 - dir2) < ANGLEPRECISION;
     }
 

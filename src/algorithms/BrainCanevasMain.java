@@ -25,7 +25,7 @@ public class BrainCanevasMain extends Brain {
 
     //---PARAMETERS---//
     private static final double HEADINGPRECISION = 0.001;
-    private static final double ANGLEPRECISION = 0.15;
+    private static final double ANGLEPRECISION = 0.175;
     private static final int THOR = 0x1EADDA;
     private static final int ROCKY = 0x5EC0;
     private static final int VANDAMME = 0x1ADA;
@@ -172,8 +172,9 @@ public class BrainCanevasMain extends Brain {
     private double getDirectionFromPoint(Position position) {
         double myX = myPosition.x;
         double myY = myPosition.y;
-        double direction = myX - position.x < 0 ? Math.atan((myY - position.y) / (myX - position.x)) : Math.PI + Math.atan((myY - position.y) / (myX - position.x));
-        return direction < 0 ? direction + 2 * Math.PI : direction;
+        return myX - position.x < 0 ?
+                Math.atan((myY - position.y) / (myX - position.x))
+                : Math.PI + Math.atan((myY - position.y) / (myX - position.x));
     }
 
     private boolean isInPosition(Position position) {
@@ -217,8 +218,6 @@ public class BrainCanevasMain extends Brain {
     }
 
     private boolean isSameDirection(double dir1, double dir2) {
-        if (dir1 < 0) dir1 = dir1 + 2 * Math.PI;
-        if (dir2 < 0) dir2 = dir2 + 2 * Math.PI;
         return Math.abs(dir1 - dir2) < ANGLEPRECISION;
     }
 
