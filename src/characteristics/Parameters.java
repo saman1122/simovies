@@ -22,7 +22,7 @@ public class Parameters {
   //---TEAM-A-PARAMETERS---//
   //-----------------------//
   public static final String teamAName = "Robot Land";
-  public static final String teamAMainBotBrainClassName = "algorithms.BrainCanevasMainA"; //class given by name; is supposed to extends robotsimulator.Brain
+  public static final String teamAMainBotBrainClassName = "algorithms.BrainCanevasMain"; //class given by name; is supposed to extends robotsimulator.Brain
   public static final String teamAMainBotAvatar = "avatars/robot-blanc.png"; //path relative to location of ant build.xml file
   public static final double teamAMainBotRadius = 50, //1 unit = 1mm, body radius
                              teamAMainBotFrontalDetectionRange = 300, //1 unit = 1mm, range of frontal sensor
@@ -40,7 +40,7 @@ public class Parameters {
                              teamAMainBot3InitY = 1200, //1 unit = 1mm, coordinate of central point
                              teamAMainBot3InitHeading = EAST; //clockwise trigonometric unit, according to screen pixel coordinate reference
 
-  public static final String teamASecondaryBotBrainClassName = "algorithms.BrainCanevasSecondaryA"; //class given by name; is supposed to extends robotsimulator.Brain
+  public static final String teamASecondaryBotBrainClassName = "algorithms.BrainCanevasSecondary"; //class given by name; is supposed to extends robotsimulator.Brain
   public static final String teamASecondaryBotAvatar = "avatars/robot-noir.png"; //path relative to location of ant build.xml file
   public static final double teamASecondaryBotRadius = 50, //1 unit = 1mm, body radius
                              teamASecondaryBotFrontalDetectionRange = 500, //1 unit = 1mm, range of frontal sensor
